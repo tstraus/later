@@ -34,9 +34,27 @@ const lest::test t[] =
                 EXPECT(b == true);
             }
 
-            SECTION("Chrono Join")
+            SECTION("Chrono Blocking")
             {
-                auto t = Later::startP(chrono::milliseconds(100), [](bool* b) {
+                Later::block(chrono::milliseconds(100), [](bool* b) {
+                    *b = true;
+                }, &b);
+
+                EXPECT(b == true);
+            }
+
+            SECTION("Millisecond Blocking")
+            {
+                Later::block(100, [](bool* b) {
+                    *b = true;
+                }, &b);
+
+                EXPECT(b == true);
+            }
+
+            SECTION("Chrono Pointer")
+            {
+                auto t = Later::startPointer(chrono::milliseconds(100), [](bool* b) {
                     *b = true;
                 }, &b);
 
@@ -45,9 +63,9 @@ const lest::test t[] =
                 EXPECT(b == true);
             }
 
-            SECTION("Millisecond Join")
+            SECTION("Millisecond Pointer")
             {
-                auto t = Later::startP(100, [](bool* b) {
+                auto t = Later::startPointer(100, [](bool* b) {
                     *b = true;
                 }, &b);
 

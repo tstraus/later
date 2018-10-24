@@ -12,7 +12,7 @@ namespace tstraus
     namespace Later
     {
         template<class Function, class... arguments>
-        const std::shared_ptr<std::thread> startP(const std::chrono::steady_clock::duration& delay, Function&& function, arguments&&... args)
+        const std::shared_ptr<std::thread> startPointer(const std::chrono::steady_clock::duration& delay, Function&& function, arguments&&... args)
         {
             auto begin = std::chrono::steady_clock::now();
 
@@ -27,22 +27,36 @@ namespace tstraus
         }
 
         template<class Function, class... arguments>
-        const std::shared_ptr<std::thread> startP(const uint32_t& millis, Function&& function, arguments&&... args)
+        const std::shared_ptr<std::thread> startPointer(const uint32_t& millis, Function&& function, arguments&&... args)
         {
-            return startP(std::chrono::milliseconds(millis), function, args...);
+            return startPointer(std::chrono::milliseconds(millis), function, args...);
+        }
+
+        template <class Function, class... arguments>
+        void block(const std::chrono::steady_clock::duration& delay, Function&& function, arguments&&... args)
+        {
+            auto t = startPointer(delay, function, args...);
+            t->join();
+        }
+
+        template <class Function, class... arguments>
+        void block(const uint32_t& millis, Function&& function, arguments&&... args)
+        {
+            auto t = startPointer(std::chrono::milliseconds(millis), function, args...);
+            t->join();
         }
 
         template <class Function, class... arguments>
         void start(const std::chrono::steady_clock::duration& delay, Function&& function, arguments&&... args)
         {
-            auto t = startP(delay, function, args...);
+            auto t = startPointer(delay, function, args...);
             t->detach();
         }
 
         template <class Function, class... arguments>
         void start(const uint32_t& millis, Function&& function, arguments&&... args)
         {
-            auto t = startP(std::chrono::milliseconds(millis), function, args...);
+            auto t = startPointer(std::chrono::milliseconds(millis), function, args...);
             t->detach();
         }
     };
